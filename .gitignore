@@ -1,3 +1,5 @@
 **/build
 in
 out
+sandbox/
+**/draft
