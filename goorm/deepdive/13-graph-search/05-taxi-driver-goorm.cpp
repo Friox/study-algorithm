@@ -34,7 +34,7 @@ struct YX {
 } dirs[4] = {{ -1, 0 }, { 1, 0 }, { 0, -1 }, { 0, 1 }};
 
 // start 위치로부터 end 위치까지의 거리를 BFS 알고리즘으로 구하여 반환하는 함수
-int bfs(vector<vector<int>> &board, YX &start, YX &end) {
+int distance(vector<vector<int>> &board, YX &start, YX &end) {
     // 좌표를 인덱스로 사용하기 위해 board 2차원 배열은 이미 (N + 1) X (N + 1) 크기.
     // 실제 입력받았던 N을 구하기 위해서는 board 배열 크기에서 1을 빼줘야 함.
     int N = board.size() - 1;
@@ -49,6 +49,9 @@ int bfs(vector<vector<int>> &board, YX &start, YX &end) {
         YX current = q.front(); q.pop();
         for (YX dir : dirs) {
             YX next = current + dir;
+            
+            // 조건필터링
+            // 다음 좌표가 좌표 범위를 벗어나거나, 갈 수 없는 좌표 또는 이미 방문한 좌표라면 생략
             if (next.y < 1 || next.y > N || next.x < 1 || next.x > N) continue;
             if (board[next.y][next.x] == 1 || visited[next.y][next.x]) continue;
             q.push(next);
@@ -89,11 +92,11 @@ int main() {
 
         // 3.   구름이의 위치로부터 손님의 출발 위치까지의 거리를 계산하고 총 거리 누적 후
         //      구름이의 위치를 손님의 출발 위치로 갱신
-        totalDistance += bfs(board, goorm, start); goorm = start;
+        totalDistance += distance(board, goorm, start); goorm = start;
 
         // 4.   손님을 태우고 도착 위치까지의 거리(유효 거리)를 계산 후
         //      구름이의 위치를 손님의 도착 위치로 갱신
-        int fareDistance = bfs(board, goorm, end); goorm = end;
+        int fareDistance = distance(board, goorm, end); goorm = end;
 
         // 5.   유효 거리를 총 거리에 누적
         totalDistance += fareDistance;
