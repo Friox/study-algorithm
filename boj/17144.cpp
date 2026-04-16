@@ -7,6 +7,7 @@ int main() {
     int R, C, T, p[2] = { 0 }, cnt = 0;
     scanf("%d %d %d", &R, &C, &T);
     int m = R * C, d[4] = { -C, C, -1, 1 };
+    int dy[2][4] = {{ -1, 0, 1, 0 }, { 1, 0, -1, 0 }}, dx[4] = { 0, 1, 0, -1 };
     vector<int> a(m), b(m), *aP = &a, *bP = &b;
     for (int i = 0; i < m; i++) {
         scanf("%d", &a[i]);
@@ -32,17 +33,18 @@ int main() {
         }
 
         // 정화
-        for (int i = p[0] - 1; i > 0; i--) (*bP)[i * C] = (*bP)[(i - 1) * C];
-        for (int i = 0; i < C - 1; i++) (*bP)[i] = (*bP)[i + 1];
-        for (int i = 0; i < p[0]; i++) (*bP)[i * C + (C - 1)] = (*bP)[(i + 1) * C + (C - 1)];
-        for (int i = C - 1; i >= 2; i--) (*bP)[p[0] * C + i] = (*bP)[p[0] * C + (i - 1)];
-        (*bP)[p[0] * C + 1] = 0;
-
-        for (int i = p[1] + 1; i < R - 1; i++) (*bP)[i * C] = (*bP)[(i + 1) * C];
-        for (int i = 0; i < C - 1; i++) (*bP)[(R - 1) * C + i] = (*bP)[(R - 1) * C + (i + 1)];
-        for (int i = R - 1; i > p[1]; i--) (*bP)[i * C + (C - 1)] = (*bP)[(i - 1) * C + (C - 1)];
-        for (int i = C - 1; i >= 2; i--) (*bP)[p[1] * C + i] = (*bP)[p[1] * C + (i - 1)];
-        (*bP)[p[1] * C + 1] = 0;
+        for (int k = 0; k < 2; k++) {
+            int y = p[k] + dy[k][0], x = 0, dir = 0;
+            while (dir < 4) {
+                int nY = y + dy[k][dir], nX = x + dx[dir];
+                if (k == 0 && (nY < 0 || nY > p[k] || nX < 0 || nX >= C)) { dir++; continue; }
+                if (k == 1 && (nY < p[k] || nY >= R || nX < 0 || nX >= C)) { dir++; continue; }
+                if (nY == p[k] && nX == 0) break;
+                (*bP)[y * C + x] = (*bP)[nY * C + nX];
+                y = nY, x = nX;
+            }
+            (*bP)[p[k] * C + 1] = 0;
+        }
 
         vector<int>* tmp = bP; bP = aP; aP = tmp;
     }
@@ -50,9 +52,7 @@ int main() {
         for (int j = 0; j < C; j++) {
             int v = (*aP)[i * C + j];
             if (v > 0) cnt += v;
-            printf("%d ", (*aP)[i * C + j]);
         }
-        printf("\n");
     }
     printf("%d", cnt);
 }
